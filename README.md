@@ -6,41 +6,45 @@ npm install node-fashion
 ```
 
 ## 使用
+users.js
+```js
+module.exports = [
+  {
+    url: '/users',
+    method: 'get',
+    handle: function (req, res) {
+      res.endcb(null, [
+        {
+          id: 123,
+          name: 'sdx'
+        },
+        {
+          id: 234,
+          name: 'dss'
+        }
+      ])
+    }
+  },
+  {
+    url: '/users/:id',
+    method: 'get',
+    handle: function (req, res) {
+      res.endcb(null, 'get users by id.')
+    }
+  },
+  {
+    url: '/users',
+    method: 'post',
+    handle: function (req, res) {
+      res.endcb(null, 'add a user.')
+    }
+  }
+]
+```
 api.js
 ```js
 module.exports = [
-  [
-    {
-      url: '/users',
-      method: 'get',
-      handle: function (req, res) {
-        res.endcb(null, [
-          {
-            id: 123,
-            name: 'sdx'
-          },
-          {
-            id: 234,
-            name: 'dss'
-          }
-        ])
-      }
-    },
-    {
-      url: '/users/:id',
-      method: 'get',
-      handle: function (req, res) {
-        res.endcb(null, 'get user by id.')
-      }
-    },
-    {
-      url: '/users',
-      method: 'post',
-      handle: function (req, res) {
-        res.endcb(null, 'add a user.')
-      }
-    }
-  ],
+  require('./users'),
   {
     url: '/hello-world',
     method: 'get',
@@ -56,11 +60,13 @@ var Server = require('node-fashion')
 
 var server = new Server()
 
+// add middleware
 server.use(function (req, res, next) {
   console.log('============[配置中间件]=============')
   next()
 })
 
+// add basic api
 server.use('/hello', function (req, res) {
   console.log('create api by [/hello].')
   res.send('test success.')
