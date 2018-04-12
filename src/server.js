@@ -63,7 +63,9 @@ var Server = function (opt) {
 
   this.logger = opt.logger || console.log
 
-  // 配置通用响应中间件函数
+  /**
+   * 配置通用响应中间件函数
+   */
   this.app.use(function (req, res, next) {
     /**
      * 定义通用响应处理函数
@@ -140,7 +142,7 @@ Server.prototype.use = function (fn) {
 }
 
 /**
- * 定义接口
+ * 定义接口路由
  * @param handles
  */
 Server.prototype.handle = function (handles) {
@@ -197,7 +199,7 @@ Server.prototype.start = function () {
   })
 
   // error handler
-  self.app.use(function (err, req, res, next) {
+  self.app.use(function (err, req, res) {
     res.status(err.status || 500)
     res.json(err)
   })
