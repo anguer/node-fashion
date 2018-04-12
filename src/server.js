@@ -226,7 +226,7 @@ Server.prototype.start = function () {
       throw error
     }
 
-    const bind = typeof port === 'string'
+    var bind = typeof port === 'string'
       ? 'Pipe ' + port
       : 'Port ' + port
 
@@ -246,8 +246,8 @@ Server.prototype.start = function () {
    * Event listener for HTTP server "listening" event.
    */
   function onListening () {
-    const addr = server.address()
-    const bind = typeof addr === 'string'
+    var addr = server.address()
+    var bind = typeof addr === 'string'
       ? 'pipe ' + addr
       : 'port ' + addr.port
     console.debug('Listening on ' + bind)
