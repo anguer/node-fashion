@@ -68,7 +68,12 @@ var Server = function (opt) {
   this.baseUrl = opt.baseUrl || DEFAULTS_BASE_URL
   this.debugger = opt.debugger || false
 
-  this.logger = opt.logger || console.log
+  this.logger = opt.logger || {
+    info: console.log,
+    warn: console.log,
+    debug: console.log,
+    error: console.error
+  }
 
   /**
    * 配置通用响应中间件函数
@@ -81,7 +86,7 @@ var Server = function (opt) {
      */
     res.endcb = res.respond = function (err, result) {
       if (err) {
-        self.logger(err)
+        self.logger.error(err)
         res.status(500).json({
           message: err.message
         })
@@ -93,21 +98,21 @@ var Server = function (opt) {
           message = result
         }
 
-        self.logger('╔════════════════════════════════════════════════╗')
-        self.logger('║              ↓↓↓Response data↓↓↓               ╚')
+        self.logger.info('╔════════════════════════════════════════════════╗')
+        self.logger.info('║              ↓↓↓Response data↓↓↓               ╚')
         if (typeof message === 'object') {
           Object.keys(message).forEach(function (key) {
             if (typeof message[key] === 'object') {
-              self.logger('║ %s =   %s', printStr(key, 10), JSON.stringify(message[key]))
+              self.logger.info('║ %s =   %s', printStr(key, 10), JSON.stringify(message[key]))
             } else {
-              self.logger('║ %s =   %s', printStr(key, 10), message[key])
+              self.logger.info('║ %s =   %s', printStr(key, 10), message[key])
             }
           })
         } else {
-          self.logger('║ %s =   %s', printStr('字符串消息', 10), message)
+          self.logger.info('║ %s =   %s', printStr('字符串消息', 10), message)
         }
-        self.logger('║              ↑↑↑Response data↑↑↑               ╔')
-        self.logger('╚════════════════════════════════════════════════╝')
+        self.logger.info('║              ↑↑↑Response data↑↑↑               ╔')
+        self.logger.info('╚════════════════════════════════════════════════╝')
         res.json(message)
       }
     }
@@ -119,12 +124,12 @@ var Server = function (opt) {
     res.err = res.error = function (err, code) {
       var statusCode = code || 500
       if (typeof err === 'object') {
-        self.logger(err.message)
+        self.logger.error(err.message)
         res.status(statusCode).json({
           message: err.message
         })
       } else {
-        self.logger(err)
+        self.logger.error(err)
         res.status(statusCode).json({
           message: err
         })
@@ -160,7 +165,7 @@ Server.prototype.handle = function (handles) {
     if (api && api.method && api.url && api.handle) {
       var method = api.method.toLowerCase()
       if (self.debugger) {
-        self.logger(
+        self.logger.debug(
           '%s::http://127.0.0.1:%s => [%s]',
           printStr(api.method.toUpperCase(), 6),
           self.port + self.baseUrl + api.url,
@@ -192,7 +197,7 @@ Server.prototype.handle = function (handles) {
       }
     })
   } else {
-    self.logger('接口定义应该是一个Object或Array.')
+    self.logger.error(new Error('接口定义应该是一个Object或Array.'))
   }
 
   self.app.use(self.baseUrl, router)
@@ -226,10 +231,11 @@ Server.prototype.start = function () {
   /**
    * Listen on provided port, on all network interfaces.
    */
-  server.listen(port, function () {
-    var p = server.address().port
-    self.logger('Express server listening on port [%s], [%s]', p, 'http://127.0.0.1:' + p)
-  })
+  server.listen(port)
+  // server.listen(port, function () {
+  //   var p = server.address().port
+  //   self.logger.info('Express server listening on port [%s], [%s]', p, 'http://127.0.0.1:' + p)
+  // })
 
   server.on('error', onError)
   server.on('listening', onListening)
@@ -248,10 +254,10 @@ Server.prototype.start = function () {
 
     // handle specific listen errors with friendly messages
     if (error.code === 'EACCES') {
-      self.logger(bind + ' requires elevated privileges')
+      self.logger.error(bind + ' requires elevated privileges')
       process.exit(1)
     } else if (error.code === 'EADDRINUSE') {
-      self.logger(bind + ' is already in use')
+      self.logger.error(bind + ' is already in use')
       process.exit(1)
     } else {
       throw error
@@ -266,7 +272,7 @@ Server.prototype.start = function () {
     var bind = typeof addr === 'string'
       ? 'pipe ' + addr
       : 'port ' + addr.port
-    console.debug('Listening on ' + bind)
+    self.logger.debug('Listening on ' + bind)
   }
 }
 
