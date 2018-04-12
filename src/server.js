@@ -1,5 +1,11 @@
 /**
- * Created by yangyue on 2017/12/1.
+ * node-fashion server.js
+ *
+ * @author: YangYue
+ * @description: source file
+ * @param:
+ *  - port
+ *  - baseUrl
  */
 var express = require('express')
 var http = require('http')
