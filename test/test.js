@@ -3,7 +3,7 @@
  */
 var Server = require('../index')
 
-var server = new Server()
+var server = new Server({debugger: true})
 
 server.use(function (req, res, next) {
   console.log('============[配置中间件]=============')

@@ -66,6 +66,7 @@ var Server = function (opt) {
   this.app = app
   this.port = normalizePort(opt.port) || DEFAULTS_PORT
   this.baseUrl = opt.baseUrl || DEFAULTS_BASE_URL
+  this.debugger = opt.debugger || false
 
   this.logger = opt.logger || console.log
 
@@ -158,7 +159,14 @@ Server.prototype.handle = function (handles) {
   function configRouter (api) {
     if (api && api.method && api.url && api.handle) {
       var method = api.method.toLowerCase()
-      // self.logger(api.url)
+      if (self.debugger) {
+        self.logger(
+          '%s::http://127.0.0.1:%s => [%s]',
+          printStr(api.method.toUpperCase(), 6),
+          self.port + self.baseUrl + api.url,
+          api.description || ''
+        )
+      }
       router[method] && router[method](api.url, api.handle)
     } else if (Object.keys(api).length > 0) {
       Object.keys(api).forEach(function (t) {

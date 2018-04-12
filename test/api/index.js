@@ -7,6 +7,7 @@ module.exports = [
   {
     url: '/hello',
     method: 'get',
+    description: 'test helloworld',
     handle: function (req, res) {
       res.send('hello world.')
     }
