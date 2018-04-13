@@ -276,4 +276,13 @@ Server.prototype.start = function () {
   }
 }
 
+/**
+ * 静态资源目录
+ * @param path
+ */
+Server.prototype.static = function (path) {
+  var self = this
+  self.app.use(express.static(path))
+}
+
 module.exports = Server
