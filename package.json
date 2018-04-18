@@ -1,6 +1,6 @@
 {
   "name": "node-fashion",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "a node http server framework.",
   "homepage": "https://github.com/anguer/node-fashion",
   "main": "index.js",
