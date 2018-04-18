@@ -18,11 +18,48 @@ npm install --save node-fashion
      - route: 所请求的路由信息, 额外包含(params, body, originalUrl)信息
      - done: 必须调用`done()`方法来结束该回调函数
  
-## Response API
- - respond:
+## 文档
+ - route
+   - url: 请求地址, 如'/users', '/users/:id'
+   - method: HTTP请求方法, [OPTIONS|GET|POST|PUT|DELETE|...]
+   - description: 描述信息
+   - handle: 请求处理函数
+     ```
+     {
+       url: '/users',
+       method: 'GET',
+       description: '获取用户列表',
+       handle: function (req, res) {
+         ...
+         res.respond(null, [
+           {id: 1, name: 'qwe'},
+           {id: 2, name: 'aaa'},
+         ])
+       }
+     }
+     ```
+     
+ - server.handle([Array | Object])
+   - 注册route, 可以传递一个route对象或route对象的数组
+   
+ - server.use()
+   - 该方法等同于Express的use方法
+   
+ - server.start()
+   - 启动服务
+   
+ - res.respond([Error Object | String], [Error Code | Object])
  ```
    // 调用通用响应处理函数
-   res.respond([Error Object], [Error Code | Application/json])
+   function (req, res) {
+     // ...
+     // error - errorCode默认是`500`
+     res.respond(new Error('error message'))
+     res.respond(new Error('error message'), 401)
+     res.respond('error message', 401)
+     // success
+     res.respond(null, [{id: 1, name: 'qwe'}, {id: 2, name: 'aaa'}])
+   }
  ```
 
 ## 使用
