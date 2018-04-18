@@ -6,7 +6,7 @@ module.exports = [
     url: '/users',
     method: 'get',
     handle: function (req, res) {
-      res.endcb(null, [
+      res.respond(null, [
         {
           id: 123,
           name: 'sdx'
@@ -26,14 +26,14 @@ module.exports = [
     url: '/users/:id',
     method: 'get',
     handle: function (req, res) {
-      res.endcb(null, 'get users by id.')
+      res.respond(null, 'get users by id.')
     }
   },
   {
     url: '/users',
     method: 'post',
     handle: function (req, res) {
-      res.endcb(null, 'add a user.')
+      res.respond(null, 'add a user.')
     }
   }
 ]

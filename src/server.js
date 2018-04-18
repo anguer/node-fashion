@@ -57,6 +57,11 @@ function printStr (target, length, place) {
 /**
  * 应用服务器 - 构造函数
  * @param opt
+ *  - port: [Number]
+ *  - baseUrl: [String]
+ *  - debugger: [Boolean]
+ *  - logger: [Object]
+ *  - beforeResponse: [Callback Function]
  * @constructor
  */
 var Server = function (opt) {
@@ -75,6 +80,41 @@ var Server = function (opt) {
     error: console.error
   }
 
+  this.beforeResponse = opt.beforeResponse || null
+  this.routeMap = {}
+
+  function printResponse (message) {
+    self.logger.info('╔════════════════════════════════════════════════╗')
+    self.logger.info('║              ↓↓↓Response data↓↓↓               ╚')
+    if (typeof message === 'object') {
+      Object.keys(message).forEach(function (key) {
+        if (typeof message[key] === 'object') {
+          self.logger.info('║ %s =   %s', printStr(key, 10), JSON.stringify(message[key]))
+        } else {
+          self.logger.info('║ %s =   %s', printStr(key, 10), message[key])
+        }
+      })
+    } else {
+      self.logger.info('║ %s =   %s', printStr('字符串消息', 10), message)
+    }
+    self.logger.info('║              ↑↑↑Response data↑↑↑               ╔')
+    self.logger.info('╚════════════════════════════════════════════════╝')
+  }
+
+  this.errorFn = function (err, code, req, res) {
+    var statusCode = code || 500
+    if (typeof err === 'object') {
+      self.logger.error(err.message)
+      return res.status(statusCode).json({
+        message: err.message
+      })
+    } else {
+      self.logger.error(err)
+      return res.status(statusCode).json({
+        message: err
+      })
+    }
+  }
   /**
    * 配置通用响应中间件函数
    */
@@ -84,55 +124,34 @@ var Server = function (opt) {
      * @param err
      * @param result
      */
-    res.endcb = res.respond = function (err, result) {
-      if (err) {
-        self.logger.error(err)
-        res.status(500).json({
-          message: err.message
-        })
-      } else {
-        var message = null
-        if (result && result.dataValues) {
-          message = result.dataValues
+    res.respond = function (err, result) {
+      function end () {
+        if (err) {
+          return self.errorFn(err, result, req, res)
         } else {
-          message = result
-        }
+          var message = null
+          if (result && result.dataValues) {
+            message = result.dataValues
+          } else {
+            message = result
+          }
 
-        self.logger.info('╔════════════════════════════════════════════════╗')
-        self.logger.info('║              ↓↓↓Response data↓↓↓               ╚')
-        if (typeof message === 'object') {
-          Object.keys(message).forEach(function (key) {
-            if (typeof message[key] === 'object') {
-              self.logger.info('║ %s =   %s', printStr(key, 10), JSON.stringify(message[key]))
-            } else {
-              self.logger.info('║ %s =   %s', printStr(key, 10), message[key])
-            }
-          })
-        } else {
-          self.logger.info('║ %s =   %s', printStr('字符串消息', 10), message)
+          printResponse(message)
+          return res.json(message)
         }
-        self.logger.info('║              ↑↑↑Response data↑↑↑               ╔')
-        self.logger.info('╚════════════════════════════════════════════════╝')
-        res.json(message)
       }
-    }
-    /**
-     * 定义异常处理函数
-     * @param err
-     * @param code
-     */
-    res.err = res.error = function (err, code) {
-      var statusCode = code || 500
-      if (typeof err === 'object') {
-        self.logger.error(err.message)
-        res.status(statusCode).json({
-          message: err.message
+
+      if (self.beforeResponse && typeof self.beforeResponse === 'function') {
+        var route = Object.assign({}, self.routeMap[req.route.path] || {})
+        route.originalUrl = req.originalUrl
+        route.params = Object.assign({}, req.params)
+        route.body = Object.assign({}, req.body)
+
+        self.beforeResponse(err, route, function () {
+          return end()
         })
       } else {
-        self.logger.error(err)
-        res.status(statusCode).json({
-          message: err
-        })
+        return end()
       }
     }
     next()
@@ -164,6 +183,8 @@ Server.prototype.handle = function (handles) {
   function configRouter (api) {
     if (api && api.method && api.url && api.handle) {
       var method = api.method.toLowerCase()
+
+      // debug模式下, 显示输出所有定义的路由地址及信息
       if (self.debugger) {
         self.logger.debug(
           '%s::http://127.0.0.1:%s => [%s]',
@@ -172,6 +193,15 @@ Server.prototype.handle = function (handles) {
           api.description || ''
         )
       }
+
+      // 缓存所有路由信息
+      self.routeMap[api.url] = {
+        url: api.url,
+        baseUrl: self.baseUrl,
+        method: method,
+        description: api.description
+      }
+      // 配置路由
       router[method] && router[method](api.url, api.handle)
     } else if (Object.keys(api).length > 0) {
       Object.keys(api).forEach(function (t) {

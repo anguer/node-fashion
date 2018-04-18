@@ -6,7 +6,7 @@ module.exports = {
     url: '/books',
     method: 'get',
     handle: function (req, res) {
-      res.json([
+      res.respond(null, [
         {
           id: 123,
           name: 'sdx'
@@ -26,7 +26,7 @@ module.exports = {
     url: '/books/:id',
     method: 'get',
     handle: function (req, res) {
-      res.send('get users by id.')
+      res.respond(null, 'get users by id.')
     }
   }
   ,
@@ -34,7 +34,7 @@ module.exports = {
     url: '/books',
     method: 'post',
     handle: function (req, res) {
-      res.send('add a user.')
+      res.respond(null, 'add a user.')
     }
   }
 }

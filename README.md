@@ -2,8 +2,29 @@
 
 ## 安装
 ```bash
-npm install node-fashion
+npm install --save node-fashion
 ```
+
+## 选项
+ - baseUrl: [String]
+ - port: [Number]
+ - debugger: [Boolean]
+ - logger: [Object]
+ - beforeResponse: [Callback Function]
+  - mast be use 'res.respond()'
+ 
+## Response API
+ - respond:
+ ```
+   /**
+    * 定义通用响应处理函数
+    * @param err
+    * @param result|errorCode
+    */
+   res.respond = function (err, result) {
+     ...
+   }
+ ```
 
 ## 使用
 users.js
@@ -13,7 +34,7 @@ module.exports = [
     url: '/users',
     method: 'get',
     handle: function (req, res) {
-      res.endcb(null, [
+      res.respond(null, [
         {
           id: 123,
           name: 'sdx'
@@ -29,14 +50,14 @@ module.exports = [
     url: '/users/:id',
     method: 'get',
     handle: function (req, res) {
-      res.endcb(null, 'get users by id.')
+      res.respond(null, 'get users by id.')
     }
   },
   {
     url: '/users',
     method: 'post',
     handle: function (req, res) {
-      res.endcb(null, 'add a user.')
+      res.respond(null, 'add a user.')
     }
   }
 ]

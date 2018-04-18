@@ -3,7 +3,13 @@
  */
 var Server = require('../index')
 
-var server = new Server({debugger: true})
+var server = new Server({
+  debugger: true,
+  beforeResponse: function (err, route, done) {
+    console.log(route)
+    done()
+  }
+})
 
 server.static('/public')
 
