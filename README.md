@@ -6,24 +6,23 @@ npm install --save node-fashion
 ```
 
 ## 选项
- - baseUrl: [String]
- - port: [Number]
- - debugger: [Boolean]
- - logger: [Object]
+ - baseUrl: [String] - 默认`/api`
+ - port: [Number] - 端口, 默认`12321`
+ - debugger: [Boolean] - 调试模式, 默认`false`
+ - logger: [Object] - 日志输出, 默认`console`
  - beforeResponse: [Callback Function]
-  - mast be use 'res.respond()'
+   - 服务器响应客户端前的自定义回调函数, 你可以在这里做一些额外的工作, 默认`null`
+   - 必须调用'res.respond()'方法, 该回调函数才会生效
+   - 该回调接受三个参数(err, route, done)
+     - err: 服务器处理返回的错误信息
+     - route: 所请求的路由信息, 额外包含(params, body, originalUrl)信息
+     - done: 必须调用`done()`方法来结束该回调函数
  
 ## Response API
  - respond:
  ```
-   /**
-    * 定义通用响应处理函数
-    * @param err
-    * @param result|errorCode
-    */
-   res.respond = function (err, result) {
-     ...
-   }
+   // 调用通用响应处理函数
+   res.respond([Error Object], [Error Code | Application/json])
  ```
 
 ## 使用
