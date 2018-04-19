@@ -61,7 +61,6 @@ function printStr (target, length, place) {
  *  - baseUrl: [String]
  *  - debugger: [Boolean]
  *  - logger: [Object]
- *  - beforeResponse: [Callback Function]
  * @constructor
  */
 var Server = function (opt) {
@@ -80,8 +79,8 @@ var Server = function (opt) {
     error: console.error
   }
 
-  this.beforeResponse = opt.beforeResponse || null
-  this.interceptors = null
+  this.beforeResponseCall = null
+  this.interceptorsCall = null
   this.routeMap = {}
 
   function printResponse (message) {
@@ -142,13 +141,13 @@ var Server = function (opt) {
         }
       }
 
-      if (self.beforeResponse && typeof self.beforeResponse === 'function') {
+      if (self.beforeResponseCall && typeof self.beforeResponseCall === 'function') {
         var route = Object.assign({}, self.routeMap[req.route.path] || {})
         route.originalUrl = req.originalUrl
         route.params = Object.assign({}, req.params)
         route.body = Object.assign({}, req.body)
 
-        self.beforeResponse(err, route, function () {
+        self.beforeResponseCall(err, route, function () {
           return end()
         })
       } else {
@@ -203,8 +202,8 @@ Server.prototype.handle = function (handles) {
         description: api.description
       }
       // 配置路由
-      if (self.interceptors && typeof self.interceptors === 'function') {
-        router[method] && router[method](api.url, self.interceptors, api.handle)
+      if (self.interceptorsCall && typeof self.interceptorsCall === 'function') {
+        router[method] && router[method](api.url, self.interceptorsCall, api.handle)
       } else {
         router[method] && router[method](api.url, api.handle)
       }
@@ -244,11 +243,20 @@ Server.prototype.handle = function (handles) {
  */
 Server.prototype.interceptors = function (fn) {
   var self = this
-  self.interceptors = function (req, res, next) {
+  self.interceptorsCall = function (req, res, next) {
     var routePath = req.route && req.route.path
     var route = Object.assign({}, self.routeMap[routePath] || {})
     return fn(req, res, route, next)
   }
+}
+
+/**
+ * 服务器响应客户端前的自定义回调函数
+ * @param fn
+ */
+Server.prototype.beforeResponse = function (fn) {
+  var self = this
+  self.beforeResponseCall = fn
 }
 
 /**

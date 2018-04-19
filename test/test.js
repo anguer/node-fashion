@@ -4,11 +4,7 @@
 var Server = require('../index')
 
 var server = new Server({
-  debugger: true,
-  beforeResponse: function (err, route, done) {
-    console.log(route)
-    done()
-  }
+  debugger: true
 })
 
 server.static('/public')
@@ -26,6 +22,11 @@ server.use('/hello', function (req, res) {
 server.interceptors(function (req, res, route, next) {
   console.log(route)
   next()
+})
+
+server.beforeResponse(function (err, route, done) {
+  console.log(route)
+  done()
 })
 
 server.handle(require('./api'))
