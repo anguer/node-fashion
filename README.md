@@ -48,6 +48,16 @@ npm install --save node-fashion
  - server.start()
    - 启动服务
    
+ - server.interceptors()
+   - 简易路由拦截器, 携带四个参数req, res, route, next,
+   - 其中route包含url,baseUrl,method,description四个属性
+     ```
+     server.interceptors(function (req, res, route, next) {
+       console.log(route)
+       next()
+     })
+   ```
+   
  - res.respond([Error Object | String], [Error Code | Object])
  ```
    // 调用通用响应处理函数

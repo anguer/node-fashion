@@ -23,6 +23,11 @@ server.use('/hello', function (req, res) {
   res.send('test success.')
 })
 
+server.interceptors(function (req, res, route, next) {
+  console.log(route)
+  next()
+})
+
 server.handle(require('./api'))
 
 server.start()

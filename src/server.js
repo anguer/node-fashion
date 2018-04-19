@@ -81,6 +81,7 @@ var Server = function (opt) {
   }
 
   this.beforeResponse = opt.beforeResponse || null
+  this.interceptors = null
   this.routeMap = {}
 
   function printResponse (message) {
@@ -202,7 +203,11 @@ Server.prototype.handle = function (handles) {
         description: api.description
       }
       // 配置路由
-      router[method] && router[method](api.url, api.handle)
+      if (self.interceptors && typeof self.interceptors === 'function') {
+        router[method] && router[method](api.url, self.interceptors, api.handle)
+      } else {
+        router[method] && router[method](api.url, api.handle)
+      }
     } else if (Object.keys(api).length > 0) {
       Object.keys(api).forEach(function (t) {
         configRouter(api[t])
@@ -231,6 +236,19 @@ Server.prototype.handle = function (handles) {
   }
 
   self.app.use(self.baseUrl, router)
+}
+
+/**
+ * 简易路由拦截器
+ * @param fn
+ */
+Server.prototype.interceptors = function (fn) {
+  var self = this
+  self.interceptors = function (req, res, next) {
+    var routePath = req.route && req.route.path
+    var route = Object.assign({}, self.routeMap[routePath] || {})
+    return fn(req, res, route, next)
+  }
 }
 
 /**
