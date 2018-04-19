@@ -141,7 +141,7 @@ var Server = function (opt) {
         }
       }
 
-      if (self.beforeResponseCall && typeof self.beforeResponseCall === 'function') {
+      if (self.beforeResponseCall && typeof self.beforeResponseCall === 'function' && req.route) {
         var route = Object.assign({}, self.routeMap[req.route.path] || {})
         route.originalUrl = req.originalUrl
         route.params = Object.assign({}, req.params)
