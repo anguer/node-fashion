@@ -1,4 +1,6 @@
-# 基于Node快速构建WEB应用服务的框架
+# 基于Express快速构建WEB应用服务的框架
+
+[![Node-Fashion](https://img.shields.io/npm/v/node-fashion.svg)](https://www.npmjs.org/package/node-fashion) [![NPM downloads](http://img.shields.io/npm/dm/node-fashion.svg)](https://npmjs.org/package/node-fashion)
 
 ## 安装
 ```bash
@@ -49,7 +51,7 @@ npm install --save node-fashion
        console.log(route)
        next()
      })
-   ```
+     ```
    
  - server.beforeResponse([Callback Function])
    - 服务器响应客户端前的自定义回调函数, 你可以在这里做一些额外的工作, 默认`null`
