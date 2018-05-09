@@ -4,9 +4,7 @@
   "description": "a node http server framework.",
   "homepage": "https://github.com/anguer/node-fashion",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "scripts": {},
   "keywords": [
     "node",
     "express",
