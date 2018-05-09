@@ -86,7 +86,7 @@ var Server = function (opt) {
   function printResponse (message) {
     self.logger.info('╔════════════════════════════════════════════════╗')
     self.logger.info('║              ↓↓↓Response data↓↓↓               ╚')
-    if (typeof message === 'object') {
+    if (message && typeof message === 'object') {
       Object.keys(message).forEach(function (key) {
         if (typeof message[key] === 'object') {
           self.logger.info('║ %s =   %s', printStr(key, 10), JSON.stringify(message[key]))
