@@ -54,6 +54,10 @@ function printStr (target, length, place) {
   return target + str.join('')
 }
 
+function getKey (route) {
+  return route.method + '|' + route.url
+}
+
 /**
  * 应用服务器 - 构造函数
  * @param opt
@@ -142,7 +146,8 @@ var Server = function (opt) {
       }
 
       if (self.beforeResponseCall && typeof self.beforeResponseCall === 'function' && req.route) {
-        var route = Object.assign({}, self.routeMap[req.route.path] || {})
+        var key = req.route && getKey({method: req.method.toLowerCase(), url: req.route.path})
+        var route = Object.assign({}, self.routeMap[key] || {})
         route.originalUrl = req.originalUrl
         route.params = Object.assign({}, req.params)
         route.body = Object.assign({}, req.body)
@@ -195,7 +200,8 @@ Server.prototype.handle = function (handles) {
       }
 
       // 缓存所有路由信息
-      self.routeMap[api.url] = {
+      var key = getKey({method, url: api.url})
+      self.routeMap[key] = {
         url: api.url,
         baseUrl: self.baseUrl,
         method: method,
@@ -244,8 +250,8 @@ Server.prototype.handle = function (handles) {
 Server.prototype.interceptors = function (fn) {
   var self = this
   self.interceptorsCall = function (req, res, next) {
-    var routePath = req.route && req.route.path
-    var route = Object.assign({}, self.routeMap[routePath] || {})
+    var key = req.route && getKey({method: req.method.toLowerCase(), url: req.route.path})
+    var route = Object.assign({}, self.routeMap[key] || {})
     return fn(req, res, route, next)
   }
 }

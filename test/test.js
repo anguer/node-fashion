@@ -20,7 +20,7 @@ server.use('/hello', function (req, res) {
 })
 
 server.interceptors(function (req, res, route, next) {
-  console.log(route)
+  console.log('route', route)
   next()
 })
 
