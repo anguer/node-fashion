@@ -6,6 +6,10 @@
 ```bash
 npm install --save node-fashion
 ```
+or use node-fashion-seed
+```bash
+git clone https://github.com/anguer/node-fashion-seed.git fashion-demo
+```
 
 ## 选项
  - baseUrl: [String] - 默认`/api`
