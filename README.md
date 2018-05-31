@@ -1,8 +1,8 @@
-# 基于Express快速构建WEB应用服务的框架
+# Lightweight REST API framework built on Express
 
 [![Node-Fashion](https://img.shields.io/npm/v/node-fashion.svg)](https://www.npmjs.org/package/node-fashion) [![NPM downloads](http://img.shields.io/npm/dm/node-fashion.svg)](https://npmjs.org/package/node-fashion)
 
-## 安装
+## Install
 ```bash
 npm install --save node-fashion
 ```
@@ -11,13 +11,13 @@ or use node-fashion-seed
 git clone https://github.com/anguer/node-fashion-seed.git fashion-demo
 ```
 
-## 选项
+## Options
  - baseUrl: [String] - 默认`/api`
  - port: [Number] - 端口, 默认`12321`
  - debugger: [Boolean] - 调试模式, 默认`false`
  - logger: [Object] - 日志输出, 默认`console`
  
-## 文档
+## Documents
  - route
    - url: 请求地址, 如'/users', '/users/:id'
    - method: HTTP请求方法, [OPTIONS|GET|POST|PUT|DELETE|...]
@@ -45,7 +45,7 @@ git clone https://github.com/anguer/node-fashion-seed.git fashion-demo
    - 该方法等同于Express的use方法
    
  - server.start()
-   - 启动服务
+   - start a server
    
  - server.interceptors([Callback Function])
    - 简易路由拦截器, 携带四个参数req, res, route, next,
@@ -79,7 +79,7 @@ git clone https://github.com/anguer/node-fashion-seed.git fashion-demo
    }
  ```
 
-## 使用
+## Usage
 users.js
 ```js
 module.exports = [
@@ -152,5 +152,5 @@ server.handle(require('./api'))
 server.start()
 ```
  
-## 作者
+## Author
  - [Anguer](https://github.com/anguer)
