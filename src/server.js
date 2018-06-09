@@ -10,49 +10,12 @@
 var express = require('express')
 var http = require('http')
 var util = require('util')
-var fill = require('lodash/fill')
+var common = require('./common')
 
 var DEFAULTS_PORT = 12321
 var DEFAULTS_BASE_URL = '/api'
 
 var app = express()
-
-/**
- * Normalize a port into a number, string, or false.
- */
-function normalizePort (val) {
-  var port = parseInt(val, 10)
-
-  if (isNaN(port)) {
-    // named pipe
-    return val
-  }
-
-  if (port >= 0) {
-    // port number
-    return port
-  }
-
-  return false
-}
-
-/**
- * 格式化输出字符串
- * @param target
- * @param length
- * @param place
- * @returns {string}
- */
-function printStr (target, length, place) {
-  target = target || ''
-  length = length || 0
-  place = place || ' '
-
-  target = target.toString()
-  length = length > target.length ? length - target.length : target.length
-  var str = fill(new Array(length), place)
-  return target + str.join('')
-}
 
 function getKey (route) {
   return route.method + '|' + route.url
@@ -72,7 +35,7 @@ var Server = function (opt) {
   opt = opt || {}
 
   this.app = app
-  this.port = normalizePort(opt.port) || DEFAULTS_PORT
+  this.port = common.normalizePort(opt.port) || DEFAULTS_PORT
   this.baseUrl = opt.baseUrl || DEFAULTS_BASE_URL
   this.debugger = opt.debugger || false
 
@@ -86,24 +49,6 @@ var Server = function (opt) {
   this.beforeResponseCall = null
   this.interceptorsCall = null
   this.routeMap = {}
-
-  function printResponse (message) {
-    self.logger.info('╔════════════════════════════════════════════════╗')
-    self.logger.info('║              ↓↓↓Response data↓↓↓               ╚')
-    if (message && typeof message === 'object') {
-      Object.keys(message).forEach(function (key) {
-        if (typeof message[key] === 'object') {
-          self.logger.info('║ %s =   %s', printStr(key, 10), JSON.stringify(message[key]))
-        } else {
-          self.logger.info('║ %s =   %s', printStr(key, 10), message[key])
-        }
-      })
-    } else {
-      self.logger.info('║ %s =   %s', printStr('字符串消息', 10), message)
-    }
-    self.logger.info('║              ↑↑↑Response data↑↑↑               ╔')
-    self.logger.info('╚════════════════════════════════════════════════╝')
-  }
 
   this.errorFn = function (err, code, req, res) {
     var statusCode = code || 500
@@ -140,7 +85,21 @@ var Server = function (opt) {
             message = result
           }
 
-          printResponse(message)
+          self.logger.info('╔════════════════════════════════════════════════╗')
+          self.logger.info('║              ↓↓↓Response data↓↓↓               ╚')
+          if (message && typeof message === 'object') {
+            Object.keys(message).forEach(function (key) {
+              if (typeof message[key] === 'object') {
+                self.logger.info('║ %s =   %s', common.printStr(key, 10), JSON.stringify(message[key]))
+              } else {
+                self.logger.info('║ %s =   %s', common.printStr(key, 10), message[key])
+              }
+            })
+          } else {
+            self.logger.info('║ %s =   %s', common.printStr('字符串消息', 10), message)
+          }
+          self.logger.info('║              ↑↑↑Response data↑↑↑               ╔')
+          self.logger.info('╚════════════════════════════════════════════════╝')
           return res.json(message)
         }
       }
@@ -193,7 +152,7 @@ Server.prototype.handle = function (handles) {
       if (self.debugger) {
         self.logger.debug(
           '%s::http://127.0.0.1:%s => [%s]',
-          printStr(api.method.toUpperCase(), 6),
+          common.printStr(api.method.toUpperCase(), 6),
           self.port + self.baseUrl + api.url,
           api.description || ''
         )
@@ -267,8 +226,9 @@ Server.prototype.beforeResponse = function (fn) {
 
 /**
  * 启动服务器
+ * @param cb
  */
-Server.prototype.start = function () {
+Server.prototype.start = function (cb) {
   var self = this
   var port = self.port
 
@@ -293,11 +253,7 @@ Server.prototype.start = function () {
   /**
    * Listen on provided port, on all network interfaces.
    */
-  server.listen(port)
-  // server.listen(port, function () {
-  //   var p = server.address().port
-  //   self.logger.info('Express server listening on port [%s], [%s]', p, 'http://127.0.0.1:' + p)
-  // })
+  server.listen(port, cb)
 
   server.on('error', onError)
   server.on('listening', onListening)

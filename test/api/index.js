@@ -3,7 +3,7 @@
  */
 module.exports = [
   require('./users'),
-  require('./books'),
+  // require('./books'),
   {
     url: '/hello',
     method: 'get',
